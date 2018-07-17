@@ -42,6 +42,8 @@ urlpatterns = [
     path('register/', RegisterView.as_view(), name="register"),
 
     path('captcha/', include('captcha.urls')),
+
+    #邮箱验证
     path('active/<slug:active_code>/',ActiveUserView.as_view(), name="user_active"),
 
     #忘记密码

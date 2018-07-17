@@ -11,6 +11,8 @@ from django.http import HttpResponse, HttpResponseRedirect
 import json
 from pure_pagination import Paginator, EmptyPage, PageNotAnInteger
 from django.shortcuts import render_to_response
+import logging
+import traceback
 
 from .models import UserProfile,EmailVerifyRecord, Banner
 from .forms import LoginForm,RegisterForm,ForgetForm,ModifyPwdForm, UploadImageForm, UserInfoForm
@@ -59,6 +61,14 @@ class RegisterView(View):
             if UserProfile.objects.filter(email=user_name):
                 return render(request, "register.html",{"register_form":register_form,"msg":"用户已经存在!"})
             pass_word = request.POST.get("password", "")
+
+            #如果邮件发送失败则注册失败
+            try:
+                send_register_email(user_name,"register")
+            except Exception as e:
+                logging.error(traceback.format_exc())
+                return render(request, "register.html",{"register_form":register_form,"msg":"邮件发送失败!"})
+
             user_profile = UserProfile()
             user_profile.username = user_name
             user_profile.is_active = False
@@ -72,7 +82,6 @@ class RegisterView(View):
             user_message.message = "欢迎注册慕学在线网"
             user_message.save()
 
-            send_register_email(user_name,"register")
             return render(request,"login.html",{})
         else:
             return render(request, "register.html",{"register_form":register_form})
