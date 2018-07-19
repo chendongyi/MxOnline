@@ -26,6 +26,8 @@ class CourseAdmin(object):
     exclude = [ 'fav_nums' ]
     inlines = [LessonInline, CourseResourceInline]
     list_editable = ['degree','desc']
+    style_fields = {"detail":"ueditor"}
+    import_excel = True
     #refresh_times = [3,5]
 
     def queryset(self):
@@ -42,6 +44,10 @@ class CourseAdmin(object):
             course_org.course_nums = Course.objects.filter(course_org=course_org).count()
             course_org.save()
 
+    def post(self, request, *args, **kwargs):
+        if 'excel' in request.FILES:
+            pass
+        return super(CourseAdmin, self).post(request, args, kwargs)
 
 
 class BannerCourseAdmin(object):
